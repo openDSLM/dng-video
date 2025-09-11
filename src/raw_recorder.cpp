@@ -632,7 +632,7 @@ static StreamRole choose_role_from_env_or_flag()
 #endif
 }
 
-int main(int argc, char **argv)
+int run_raw_recorder(int argc, char **argv)
 {
     std::signal(SIGINT, sigint_handler);
     std::signal(SIGTERM, sigint_handler);
