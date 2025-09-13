@@ -18,16 +18,23 @@ cmake --build build
 
 Options:
 
-- `--fps <fps>`               target frames per second
+- `-o, --output <dir>`        directory for captured DNG frames
+- `-t, --timeout <ms>`        capture duration in milliseconds (currently ignored)
+- `--fps, --framerate <fps>`  target frames per second
 - `--shutter <microsec>`      exposure time in microseconds
-- `--gain <gain>`             analogue gain
+- `--gain <gain>`             analogue gain (alias: `--analoggain`)
 - `--ae <0|1>`                disable auto-exposure if set to 1
 - `--awb <0|1>`               disable auto white balance if set to 1
 - `--preview`                 enable hardware preview stream
+- `-n, --nopreview`           disable preview
 - `--preview-size WxH`        preview dimensions
 - `--preview-sink <sink>`     preview sink (`gl` or `kmssink`)
 - `--preview-every N`         push every Nth preview frame
-- `--size WxH`                RAW stream size
+- `--size WxH` or `--width` & `--height` specify RAW stream size
+- `--buffer-count N`          minimum buffers for capture
+- `--raw-format <fmt>`        force RAW pixel format (e.g. `SRGGB12`)
+- `--camera <index>`          select camera by index
+- `--list-cameras`            list available cameras and exit
 
 The legacy environment variable overrides from the original proof of
 concept remain available.

@@ -669,7 +669,20 @@ int run_raw_recorder(int argc, char **argv)
     CameraManager cm;
     if (cm.start()) { std::fprintf(stderr, "CameraManager start failed\n"); return 1; }
     if (cm.cameras().empty()) { std::fprintf(stderr, "No cameras found\n"); return 1; }
-    std::shared_ptr<Camera> cam = cm.cameras()[0];
+
+    if (const char *listEnv = std::getenv("LIST_CAMERAS")) {
+        for (size_t i = 0; i < cm.cameras().size(); ++i)
+            std::printf("%zu: %s\n", i, cm.cameras()[i]->id().c_str());
+        return 0;
+    }
+
+    int camIndex = 0;
+    if (const char *ci = std::getenv("CAMERA_INDEX")) {
+        int idx = std::atoi(ci);
+        if (idx >= 0 && idx < static_cast<int>(cm.cameras().size())) camIndex = idx;
+    }
+
+    std::shared_ptr<Camera> cam = cm.cameras()[camIndex];
     if (cam->acquire()) { std::fprintf(stderr, "Camera acquire failed\n"); return 1; }
 
     // StreamRole (feature flag + runtime override)
