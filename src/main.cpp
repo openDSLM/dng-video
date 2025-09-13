@@ -6,12 +6,39 @@
 #include <string>
 #include <vector>
 
+namespace {
+
+void print_help(const char *prog) {
+    std::cout << "Usage: " << prog << " [options] [output_directory]\n\n"
+              << "Options:\n"
+              << "  --fps <fps>               target frames per second\n"
+              << "  --shutter <microsec>      exposure time in microseconds\n"
+              << "  --gain <gain>             analogue gain\n"
+              << "  --ae <0|1>                disable auto-exposure if set to 1\n"
+              << "  --awb <0|1>               disable auto white balance if set to 1\n"
+              << "  --preview                 enable hardware preview stream\n"
+              << "  --preview-size WxH        preview dimensions\n"
+              << "  --preview-sink <sink>     preview sink (gl or kmssink)\n"
+              << "  --preview-every N         push every Nth preview frame\n"
+              << "  --size WxH                RAW stream size\n"
+              << "  --help, -h                display this help and exit\n"
+              << "  --version, -v             output version information and exit\n";
+}
+
+} // namespace
+
 int main(int argc, char **argv) {
     std::string outDir = "./frames";
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
-        if (arg == "--fps" && i + 1 < argc) {
+        if (arg == "--help" || arg == "-h") {
+            print_help(argv[0]);
+            return 0;
+        } else if (arg == "--version" || arg == "-v") {
+            std::cout << "dng-recorder version " << DNG_RECORDER_VERSION << std::endl;
+            return 0;
+        } else if (arg == "--fps" && i + 1 < argc) {
             setenv("FPS", argv[++i], 1);
         } else if (arg == "--shutter" && i + 1 < argc) {
             setenv("EXP_US", argv[++i], 1);
