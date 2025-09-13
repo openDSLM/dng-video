@@ -1,13 +1,16 @@
 # dng-video
 
-Prototype raw video recorder using libcamera. The recorder now exposes a
-command line interface compatible with common `rpicam-vid` parameters.
+Prototype cinema dng video recorder using libcamera for raspi
 
 ## Building
 
 ```sh
 cmake -S . -B build
 cmake --build build
+
+Only tested on
+- Raspi 5
+- IMX585 
 ```
 
 ## Usage
