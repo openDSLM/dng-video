@@ -2,15 +2,15 @@
 
 Prototype cinema dng video recorder using libcamera for raspi
 
+Only tested on
+- Raspi 5 with IMX585 
+
 ## Building
 
 ```sh
 cmake -S . -B build
 cmake --build build
 
-Only tested on
-- Raspi 5
-- IMX585 
 ```
 
 ## Usage
