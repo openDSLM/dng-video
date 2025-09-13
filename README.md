@@ -16,6 +16,9 @@ cmake --build build
 ./build/dng-recorder [options] [output_directory]
 ```
 
+Run `./build/dng-recorder --help` to see a full list of options or `--version`
+to print the application's version.
+
 Options:
 
 - `--fps <fps>`               target frames per second
@@ -28,6 +31,8 @@ Options:
 - `--preview-sink <sink>`     preview sink (`gl` or `kmssink`)
 - `--preview-every N`         push every Nth preview frame
 - `--size WxH`                RAW stream size
+- `--help, -h`                display help and exit
+- `--version, -v`             show program version and exit
 
 The legacy environment variable overrides from the original proof of
 concept remain available.
