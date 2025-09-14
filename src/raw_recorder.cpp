@@ -155,10 +155,13 @@ static bool write_dng16(const std::string &path,
 
     uint16_t blDim[2] = {1, 1};
     TIFFSetField(tif, TIFFTAG_BLACKLEVELREPEATDIM, blDim);
-    uint16_t bl = blackLevel;
+    double bl = static_cast<double>(blackLevel);
     TIFFSetField(tif, TIFFTAG_BLACKLEVEL, 1, &bl);
-    if (whiteLevel)
-        TIFFSetField(tif, TIFFTAG_WHITELEVEL, whiteLevel);
+    if (whiteLevel) {
+        double wl = static_cast<double>(whiteLevel);
+        TIFFSetField(tif, TIFFTAG_WHITELEVEL, 1, &wl);
+    }
+
 
     uint8_t dngVersion[4] = {1, 4, 0, 0};
     TIFFSetField(tif, TIFFTAG_DNGVERSION, dngVersion);
