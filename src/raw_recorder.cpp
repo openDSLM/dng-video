@@ -121,8 +121,8 @@ static bool write_dng16(const std::string &path,
                         uint32_t width,
                         uint32_t height,
                         const std::string &cfa,
-                        uint16_t /*blackLevel*/ = 0,
-                        uint32_t /*whiteLevel*/ = 0)
+                        uint16_t blackLevel = 0,
+                        uint32_t whiteLevel = 0)
 {
     TIFF *tif = TIFFOpen(path.c_str(), "w");
     if (!tif) { std::perror("TIFFOpen"); return false; }
@@ -148,6 +148,22 @@ static bool write_dng16(const std::string &path,
     uint16_t dim[2] = {2, 2};
     TIFFSetField(tif, TIFFTAG_CFAREPEATPATTERNDIM, dim);
     TIFFSetField(tif, TIFFTAG_CFAPATTERN, 4, patt);
+
+    uint8_t cfaColors[3] = {0, 1, 2};
+    TIFFSetField(tif, TIFFTAG_CFAPLANECOLOR, 3, cfaColors);
+    TIFFSetField(tif, TIFFTAG_CFALAYOUT, 1); // rectangular
+
+    uint16_t blDim[2] = {1, 1};
+    TIFFSetField(tif, TIFFTAG_BLACKLEVELREPEATDIM, blDim);
+    double bl = static_cast<double>(blackLevel);
+    TIFFSetField(tif, TIFFTAG_BLACKLEVEL, 1, &bl);
+    if (whiteLevel) {
+        double wl = static_cast<double>(whiteLevel);
+        TIFFSetField(tif, TIFFTAG_WHITELEVEL, 1, &wl);
+    }
+
+    uint8_t dngVersion[4] = {1, 4, 0, 0};
+    TIFFSetField(tif, TIFFTAG_DNGVERSION, dngVersion);
 
     // One big strip → fewer syscalls
     TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, height);
@@ -260,7 +276,8 @@ static void init_image_pool(size_t poolN, uint32_t w, uint32_t h)
     }
 }
 
-static void writer_thread(std::string outDir, uint32_t w, uint32_t h, std::string cfa)
+static void writer_thread(std::string outDir, uint32_t w, uint32_t h,
+                          std::string cfa, uint16_t blackLevel, uint32_t whiteLevel)
 {
     for (;;) {
         std::pair<size_t, uint64_t> job;
@@ -282,7 +299,7 @@ static void writer_thread(std::string outDir, uint32_t w, uint32_t h, std::strin
         char name[256];
         std::snprintf(name, sizeof(name), "frame_%06llu.dng", (unsigned long long)idx);
         const std::string path = (std::filesystem::path(outDir) / name).string();
-        if (write_dng16(path, img.data(), w, h, cfa))
+        if (write_dng16(path, img.data(), w, h, cfa, blackLevel, whiteLevel))
             ++g_saved;
 
         // Return slot to pool
@@ -843,8 +860,12 @@ int run_raw_recorder(int argc, char **argv)
 
     cam->requestCompleted.connect(&on_request_completed);
 
+    uint16_t blackLevel = 0;
+    uint32_t whiteLevel = is16 ? 65535u : 4095u;
+
     // spin up writer thread
-    std::thread wt(writer_thread, ctx.outDir, sizeRaw.width, sizeRaw.height, cfa);
+    std::thread wt(writer_thread, ctx.outDir, sizeRaw.width, sizeRaw.height, cfa,
+                   blackLevel, whiteLevel);
 
 #ifndef NO_GST
     // Start preview pipeline before camera to reduce startup latency
