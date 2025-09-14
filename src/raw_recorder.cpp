@@ -162,6 +162,7 @@ static bool write_dng16(const std::string &path,
         TIFFSetField(tif, TIFFTAG_WHITELEVEL, 1, &wl);
     }
 
+
     uint8_t dngVersion[4] = {1, 4, 0, 0};
     TIFFSetField(tif, TIFFTAG_DNGVERSION, dngVersion);
 
